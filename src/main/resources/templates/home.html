@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoRent - Agence de Location de Voitures</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+
+<nav th:replace="~{common/layout :: navbar}"></nav>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container py-5">
+        <div class="row align-items-center min-vh-50">
+            <div class="col-lg-6 text-white">
+                <h1 class="display-4 fw-bold mb-4">
+                    Louez votre voiture idéale
+                </h1>
+                <p class="lead mb-4">
+                    Large choix de véhicules, prix compétitifs, service professionnel.
+                    Réservez en ligne en quelques clics.
+                </p>
+                <a th:href="@{/vehicules}" class="btn btn-warning btn-lg px-5 fw-bold">
+                    <i class="fas fa-search me-2"></i>Voir nos véhicules
+                </a>
+            </div>
+            <div class="col-lg-6">
+                <!-- Formulaire de recherche -->
+                <div class="card shadow-lg">
+                    <div class="card-header bg-warning text-dark fw-bold">
+                        <i class="fas fa-calendar-check me-2"></i>Recherche rapide
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/vehicules/rechercher}" method="post" th:object="${searchDto}">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Date de début</label>
+                                <input type="date" class="form-control" th:field="*{dateDebut}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Date de fin</label>
+                                <input type="date" class="form-control" th:field="*{dateFin}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Catégorie</label>
+                                <select class="form-select" th:field="*{categorieId}">
+                                    <option value="">Toutes catégories</option>
+                                    <option th:each="cat : ${categories}"
+                                            th:value="${cat.id}"
+                                            th:text="${cat.nom}"></option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-dark w-100 fw-bold">
+                                <i class="fas fa-search me-2"></i>Rechercher
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="feature-icon bg-warning rounded-circle mx-auto mb-3">
+                    <i class="fas fa-car fa-2x text-dark"></i>
+                </div>
+                <h5 class="fw-bold">Large choix</h5>
+                <p class="text-muted">Plus de 50 véhicules disponibles</p>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-icon bg-warning rounded-circle mx-auto mb-3">
+                    <i class="fas fa-shield-alt fa-2x text-dark"></i>
+                </div>
+                <h5 class="fw-bold">Assurance incluse</h5>
+                <p class="text-muted">Tous nos véhicules sont assurés</p>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-icon bg-warning rounded-circle mx-auto mb-3">
+                    <i class="fas fa-clock fa-2x text-dark"></i>
+                </div>
+                <h5 class="fw-bold">Réservation 24h/7j</h5>
+                <p class="text-muted">Réservez en ligne à tout moment</p>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-icon bg-warning rounded-circle mx-auto mb-3">
+                    <i class="fas fa-headset fa-2x text-dark"></i>
+                </div>
+                <h5 class="fw-bold">Support client</h5>
+                <p class="text-muted">Notre équipe vous accompagne</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Véhicules disponibles -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="fw-bold mb-4">Véhicules disponibles</h2>
+        <div class="row g-4">
+            <div class="col-md-4" th:each="v : ${vehicules}" th:if="${vStat.index < 6}">
+                <div class="card h-100 shadow-sm vehicle-card">
+                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height:180px">
+                        <i class="fas fa-car fa-4x text-white"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5 class="card-title fw-bold" th:text="${v.marque + ' ' + v.modele}"></h5>
+                            <span class="badge bg-warning text-dark" th:text="${v.categorie.nom}"></span>
+                        </div>
+                        <p class="text-muted small mb-2" th:text="${v.description}"></p>
+                        <div class="row g-2 small mb-3">
+                            <div class="col-6">
+                                <i class="fas fa-users me-1 text-muted"></i>
+                                <span th:text="${v.nombrePlaces + ' places'}"></span>
+                            </div>
+                            <div class="col-6">
+                                <i class="fas fa-gas-pump me-1 text-muted"></i>
+                                <span th:text="${v.typeCarburant}"></span>
+                            </div>
+                            <div class="col-6">
+                                <i class="fas fa-cog me-1 text-muted"></i>
+                                <span th:text="${v.transmission}"></span>
+                            </div>
+                            <div class="col-6">
+                                <i class="fas fa-calendar me-1 text-muted"></i>
+                                <span th:text="${v.annee}"></span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-success fs-5">
+                                <span th:text="${v.prixParJour}"></span> MRU/jour
+                            </span>
+                            <div>
+                                <a th:href="@{/vehicules/{id}(id=${v.id})}" class="btn btn-outline-dark btn-sm me-1">
+                                    Détails
+                                </a>
+                                <a th:href="@{/client/reserver/{id}(id=${v.id})}" class="btn btn-warning btn-sm">
+                                    Réserver
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a th:href="@{/vehicules}" class="btn btn-dark btn-lg px-5">
+                Voir tous les véhicules <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{common/layout :: footer}"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

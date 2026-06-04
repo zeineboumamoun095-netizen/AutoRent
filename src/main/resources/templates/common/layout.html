@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoRent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg navbar-autorent" th:fragment="navbar">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">
+            <i class="fas fa-car-side me-2"></i>Auto<span class="brand-accent">Rent</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+            <i class="fas fa-bars text-white"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navMain">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}"><i class="fas fa-home me-1"></i>Accueil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/vehicules}"><i class="fas fa-car me-1"></i>Véhicules</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav align-items-center gap-2">
+                <!-- Not logged in -->
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="nav-link btn-nav-login" th:href="@{/login}">
+                        <i class="fas fa-sign-in-alt me-1"></i>Connexion
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="nav-link btn-nav-signup" th:href="@{/inscription}">
+                        S'inscrire
+                    </a>
+                </li>
+                <!-- Logged in -->
+                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown">
+                        <div style="width:32px;height:32px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-user" style="color:var(--primary);font-size:0.85rem;"></i>
+                        </div>
+                        <span class="text-white" style="font-size:0.88rem;" sec:authentication="name">Utilisateur</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li sec:authorize="hasRole('ADMIN')">
+                            <a class="dropdown-item" th:href="@{/admin/dashboard}">
+                                <i class="fas fa-shield-alt me-2 text-danger"></i>Administration
+                            </a>
+                        </li>
+                        <li sec:authorize="hasAnyRole('AGENT','ADMIN')">
+                            <a class="dropdown-item" th:href="@{/agent/dashboard}">
+                                <i class="fas fa-headset me-2 text-info"></i>Espace Agent
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" th:href="@{/client/dashboard}">
+                                <i class="fas fa-calendar-check me-2 text-success"></i>Mes Réservations
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer" th:fragment="footer">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <div class="footer-brand"><i class="fas fa-car-side me-2"></i>Auto<span class="accent">Rent</span></div>
+                <p class="mt-2 mb-0">Votre partenaire de confiance pour la location de véhicules.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <p class="mb-1 text-white-50 small"><i class="fas fa-phone me-2"></i>+222 33 09 55 55</p>
+                <p class="mb-0 text-white-50 small"><i class="fas fa-envelope me-2"></i>contact@autorent.mr</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <p class="text-white-50 small mb-0">Lun - Sam: 08h00 - 20h00</p>
+                <p class="text-white-50 small mb-0">Dim: 09h00 - 18h00</p>
+            </div>
+        </div>
+        <hr class="footer-divider">
+        <p class="footer-copy">&copy; 2026 AutoRent &mdash; Tous droits réservés.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

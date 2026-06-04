@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion - AutoRent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="text-center mb-4">
+                <a th:href="@{/}" class="text-decoration-none text-dark">
+                    <i class="fas fa-car fa-3x text-warning"></i>
+                    <h2 class="fw-bold mt-2">AutoRent</h2>
+                </a>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white text-center py-3">
+                    <h4 class="mb-0"><i class="fas fa-sign-in-alt me-2"></i>Connexion</h4>
+                </div>
+                <div class="card-body p-4">
+
+                    <div class="alert alert-success" th:if="${param.logout}">
+                        <i class="fas fa-check-circle me-2"></i>Déconnexion réussie.
+                    </div>
+                    <div class="alert alert-danger" th:if="${param.error}">
+                        <i class="fas fa-exclamation-circle me-2"></i>Email ou mot de passe incorrect.
+                    </div>
+                    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+
+                    <form th:action="@{/login}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control" name="username"
+                                       placeholder="votre@email.com" required autofocus>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Mot de passe</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" name="password"
+                                       placeholder="••••••••" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 fw-bold btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+                        </button>
+                    </form>
+                </div>
+                <div class="card-footer text-center py-3">
+                    <small class="text-muted">Pas encore de compte ?
+                        <a th:href="@{/inscription}" class="fw-bold text-warning">S'inscrire</a>
+                    </small>
+                </div>
+            </div>
+
+            <!-- Comptes de démonstration -->
+
+            
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

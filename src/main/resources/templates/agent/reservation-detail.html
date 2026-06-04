@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail Réservation - Agent AutoRent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+<nav th:replace="~{common/layout :: navbar}"></nav>
+
+<div class="container-fluid p-0">
+    <div class="d-flex" style="min-height: calc(100vh - 73px)">
+        <div class="sidebar" style="width:240px;flex-shrink:0;">
+            <div class="sidebar-header">
+                <span class="role-badge">Agent</span>
+                <p class="sidebar-title">Espace Agent</p>
+            </div>
+            <nav class="sidebar-nav">
+                <span class="nav-section">Navigation</span>
+                <a th:href="@{/agent/dashboard}" class="sidebar-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a th:href="@{/agent/reservations}" class="sidebar-link active"><i class="fas fa-calendar-check"></i> Réservations</a>
+                <a th:href="@{/agent/agenda}" class="sidebar-link"><i class="fas fa-calendar-alt"></i> Agenda</a>
+                <a th:href="@{/agent/vehicules}" class="sidebar-link"><i class="fas fa-car"></i> Véhicules</a>
+            </nav>
+        </div>
+
+        <div class="flex-grow-1 p-0">
+            <div class="page-header">
+                <div>
+                    <h3>Détail Réservation <span style="color:var(--accent)" th:text="'#' + ${reservation.id}"></span></h3>
+                    <ol class="breadcrumb breadcrumb-ar mb-0">
+                        <li class="breadcrumb-item"><a th:href="@{/agent/reservations}">Réservations</a></li>
+                        <li class="breadcrumb-item active">Détail</li>
+                    </ol>
+                </div>
+                <div class="d-flex gap-2">
+                    <form th:action="@{/agent/reservation/{id}/confirmer(id=${reservation.id})}"
+                          method="post" th:if="${reservation.statut.name() == 'EN_ATTENTE'}">
+                        <button type="submit" class="btn-success-ar">
+                            <i class="fas fa-check me-1"></i>Confirmer
+                        </button>
+                    </form>
+                    <form th:action="@{/agent/reservation/{id}/statut(id=${reservation.id})}"
+                          method="post" th:if="${reservation.statut.name() == 'CONFIRMEE'}">
+                        <input type="hidden" name="statut" value="EN_COURS">
+                        <button type="submit" class="btn-primary-ar">
+                            <i class="fas fa-play me-1"></i>Démarrer
+                        </button>
+                    </form>
+                    <form th:action="@{/agent/reservation/{id}/statut(id=${reservation.id})}"
+                          method="post" th:if="${reservation.statut.name() == 'EN_COURS'}">
+                        <input type="hidden" name="statut" value="TERMINEE">
+                        <button type="submit" class="btn-outline-ar">
+                            <i class="fas fa-stop me-1"></i>Terminer
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="px-4 pb-4">
+                <div class="row g-4">
+                    <!-- Left: Reservation details -->
+                    <div class="col-md-7">
+                        <div class="form-card">
+                            <div class="form-card-header">
+                                <i class="fas fa-calendar-check me-2"></i>Informations de la Réservation
+                            </div>
+                            <div class="form-card-body">
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <label class="ar-label">Statut</label>
+                                        <div>
+                      <span class="badge-ar badge-waiting"
+                            th:if="${reservation.statut.name() == 'EN_ATTENTE'}"
+                            th:text="${reservation.statut}"></span>
+                                            <span class="badge-ar badge-confirmed"
+                                                  th:if="${reservation.statut.name() == 'CONFIRMEE'}"
+                                                  th:text="${reservation.statut}"></span>
+                                            <span class="badge-ar badge-ongoing"
+                                                  th:if="${reservation.statut.name() == 'EN_COURS'}"
+                                                  th:text="${reservation.statut}"></span>
+                                            <span class="badge-ar badge-done"
+                                                  th:if="${reservation.statut.name() == 'TERMINEE'}"
+                                                  th:text="${reservation.statut}"></span>
+                                            <span class="badge-ar badge-cancelled"
+                                                  th:if="${reservation.statut.name() == 'ANNULEE'}"
+                                                  th:text="${reservation.statut}"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="ar-label">Créée le</label>
+                                        <div class="td-bold" th:text="${#temporals.format(reservation.dateCreation, 'dd/MM/yyyy')}"></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="ar-label">Date de début</label>
+                                        <div class="td-bold" th:text="${#temporals.format(reservation.dateDebut, 'dd/MM/yyyy')}"></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="ar-label">Date de fin</label>
+                                        <div class="td-bold" th:text="${#temporals.format(reservation.dateFin, 'dd/MM/yyyy')}"></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="ar-label">Durée</label>
+                                        <div class="td-bold" th:text="${reservation.nombreJours + ' jour(s)'}"></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="ar-label">Coût Total</label>
+                                        <div style="font-size:1.4rem;font-weight:800;color:var(--primary);"
+                                             th:text="${reservation.coutTotal + ' €'}"></div>
+                                    </div>
+                                    <div class="col-12" th:if="${reservation.remarques}">
+                                        <label class="ar-label">Remarques</label>
+                                        <div style="background:var(--light-bg);padding:12px;border-radius:8px;font-size:0.9rem;"
+                                             th:text="${reservation.remarques}"></div>
+                                    </div>
+                                    <div class="col-12" th:if="${reservation.agent}">
+                                        <label class="ar-label">Traité par</label>
+                                        <div class="td-bold" th:text="${reservation.agent.fullName}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Client + Vehicle -->
+                    <div class="col-md-5">
+                        <div class="form-card mb-4">
+                            <div class="form-card-header">
+                                <i class="fas fa-user me-2"></i>Client
+                            </div>
+                            <div class="form-card-body">
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div style="width:48px;height:48px;background:var(--light-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--border);">
+                                        <i class="fas fa-user" style="color:var(--text-muted);"></i>
+                                    </div>
+                                    <div>
+                                        <div class="td-bold" th:text="${reservation.client.fullName}"></div>
+                                        <div class="td-muted" th:text="${reservation.client.email}"></div>
+                                    </div>
+                                </div>
+                                <div class="td-muted small" th:if="${reservation.client.telephone}">
+                                    <i class="fas fa-phone me-2"></i><span th:text="${reservation.client.telephone}"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-card">
+                            <div class="form-card-header">
+                                <i class="fas fa-car me-2"></i>Véhicule
+                            </div>
+                            <div class="form-card-body">
+                                <div style="background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:10px;height:100px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+                                    <i class="fas fa-car fa-3x text-white" style="opacity:0.8;"></i>
+                                </div>
+                                <div class="td-bold mb-1" th:text="${reservation.vehicule.marque + ' ' + reservation.vehicule.modele}"></div>
+                                <div class="td-muted mb-2" th:text="${reservation.vehicule.immatriculation}"></div>
+                                <div class="d-flex gap-2">
+                                    <span class="badge-ar badge-agent" th:text="${reservation.vehicule.categorie.nom}"></span>
+                                    <span class="badge-ar badge-client" th:text="${reservation.vehicule.typeCarburant}"></span>
+                                </div>
+                                <div class="mt-3" style="font-size:1.2rem;font-weight:700;color:var(--primary);">
+                                    <th:block th:text="${reservation.vehicule.prixParJour}"></th:block>
+                                    <span style="font-size:0.78rem;font-weight:400;color:var(--text-muted);"> €/jour</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{common/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

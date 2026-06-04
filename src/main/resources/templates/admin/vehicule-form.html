@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Véhicule Form - Admin AutoRent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+<nav th:replace="~{common/layout :: navbar}"></nav>
+
+<div class="container-fluid p-0">
+    <div class="d-flex" style="min-height: calc(100vh - 73px)">
+        <div class="sidebar" style="width:240px;flex-shrink:0;">
+            <div class="sidebar-header">
+                <span class="role-badge">Admin</span>
+                <p class="sidebar-title">Administration</p>
+            </div>
+            <nav class="sidebar-nav">
+                <span class="nav-section">Tableau de bord</span>
+                <a th:href="@{/admin/dashboard}" class="sidebar-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <span class="nav-section">Gestion</span>
+                <a th:href="@{/admin/utilisateurs}" class="sidebar-link"><i class="fas fa-users"></i> Utilisateurs</a>
+                <a th:href="@{/admin/vehicules}" class="sidebar-link active"><i class="fas fa-car"></i> Véhicules</a>
+                <a th:href="@{/admin/categories}" class="sidebar-link"><i class="fas fa-tags"></i> Catégories</a>
+                <a th:href="@{/admin/reservations}" class="sidebar-link"><i class="fas fa-calendar"></i> Réservations</a>
+            </nav>
+        </div>
+
+        <div class="flex-grow-1 p-0">
+            <div class="page-header">
+                <div>
+                    <h3 th:text="${vehicule.id == null ? 'Nouveau Véhicule' : 'Modifier le Véhicule'}">Véhicule</h3>
+                    <ol class="breadcrumb breadcrumb-ar mb-0">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/vehicules}">Véhicules</a></li>
+                        <li class="breadcrumb-item active" th:text="${vehicule.id == null ? 'Nouveau' : 'Modifier'}"></li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="px-4 pb-4">
+                <div class="row justify-content-center">
+                    <div class="col-md-9">
+                        <div class="form-card">
+                            <div class="form-card-header">
+                                <i class="fas fa-car me-2"></i>
+                                <span th:text="${vehicule.id == null ? 'Informations du nouveau véhicule' : 'Modifier les informations'}"></span>
+                            </div>
+                            <div class="form-card-body">
+                                <form th:action="${vehicule.id == null ? '/admin/vehicule/nouveau' : '/admin/vehicule/' + vehicule.id + '/modifier'}"
+                                      method="post" th:object="${vehicule}">
+
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <label class="ar-label">Marque *</label>
+                                            <input type="text" class="ar-input" th:field="*{marque}" placeholder="Ex: Peugeot" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="ar-label">Modèle *</label>
+                                            <input type="text" class="ar-input" th:field="*{modele}" placeholder="Ex: 308" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="ar-label">Année *</label>
+                                            <input type="number" class="ar-input" th:field="*{annee}" min="2000" max="2025" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="ar-label">Immatriculation *</label>
+                                            <input type="text" class="ar-input" th:field="*{immatriculation}"
+                                                   placeholder="AB-123-CD" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="ar-label">Couleur</label>
+                                            <input type="text" class="ar-input" th:field="*{couleur}" placeholder="Ex: Blanc">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="ar-label">Prix par Jour (€) *</label>
+                                            <input type="number" class="ar-input" th:field="*{prixParJour}"
+                                                   min="1" step="0.5" placeholder="45.00" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="ar-label">Nombre de Places</label>
+                                            <input type="number" class="ar-input" th:field="*{nombrePlaces}" min="1" max="9">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="ar-label">Kilométrage</label>
+                                            <input type="number" class="ar-input" th:field="*{kilometrage}" min="0">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="ar-label">Type Carburant</label>
+                                            <select class="ar-select" th:field="*{typeCarburant}">
+                                                <option value="">-- Choisir --</option>
+                                                <option value="Essence">Essence</option>
+                                                <option value="Diesel">Diesel</option>
+                                                <option value="Hybride">Hybride</option>
+                                                <option value="Électrique">Électrique</option>
+                                                <option value="GPL">GPL</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="ar-label">Transmission</label>
+                                            <select class="ar-select" th:field="*{transmission}">
+                                                <option value="">-- Choisir --</option>
+                                                <option value="Manuelle">Manuelle</option>
+                                                <option value="Automatique">Automatique</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="ar-label">Catégorie *</label>
+                                            <select class="ar-select" th:field="*{categorie.id}" required>
+                                                <option value="">-- Choisir --</option>
+                                                <option th:each="cat : ${categories}"
+                                                        th:value="${cat.id}"
+                                                        th:text="${cat.nom}"
+                                                        th:selected="${vehicule.categorie != null && vehicule.categorie.id == cat.id}">
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="ar-label">Disponible</label>
+                                            <div class="d-flex align-items-center gap-3 mt-1">
+                                                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                                                    <input type="radio" th:field="*{disponible}" th:value="true"> Oui
+                                                </label>
+                                                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                                                    <input type="radio" th:field="*{disponible}" th:value="false"> Non
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="ar-label">Description</label>
+                                            <textarea class="ar-input" th:field="*{description}" rows="3"
+                                                      placeholder="Description du véhicule..."></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex gap-3 mt-4 pt-3" style="border-top:1.5px solid var(--border);">
+                                        <a th:href="@{/admin/vehicules}" class="btn-outline-ar" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+                                            <i class="fas fa-arrow-left"></i> Annuler
+                                        </a>
+                                        <button type="submit" class="btn-primary-ar flex-grow-1">
+                                            <i class="fas fa-save me-2"></i>
+                                            <span th:text="${vehicule.id == null ? 'Créer le véhicule' : 'Enregistrer les modifications'}"></span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{common/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

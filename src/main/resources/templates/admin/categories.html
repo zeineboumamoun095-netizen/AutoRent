@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Catégories - Admin AutoRent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+<nav th:replace="~{common/layout :: navbar}"></nav>
+
+<div class="container-fluid p-0">
+    <div class="d-flex" style="min-height: calc(100vh - 73px)">
+
+        <div class="sidebar" style="width:240px;flex-shrink:0;">
+            <div class="sidebar-header">
+                <span class="role-badge">Admin</span>
+                <p class="sidebar-title">Administration</p>
+            </div>
+            <nav class="sidebar-nav">
+                <span class="nav-section">Tableau de bord</span>
+                <a th:href="@{/admin/dashboard}" class="sidebar-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <span class="nav-section">Gestion</span>
+                <a th:href="@{/admin/utilisateurs}" class="sidebar-link"><i class="fas fa-users"></i> Utilisateurs</a>
+                <a th:href="@{/admin/vehicules}" class="sidebar-link"><i class="fas fa-car"></i> Véhicules</a>
+                <a th:href="@{/admin/categories}" class="sidebar-link active"><i class="fas fa-tags"></i> Catégories</a>
+                <a th:href="@{/admin/reservations}" class="sidebar-link"><i class="fas fa-calendar"></i> Réservations</a>
+                <span class="nav-section">Outils</span>
+                <a th:href="@{/agent/agenda}" class="sidebar-link"><i class="fas fa-calendar-alt"></i> Agenda</a>
+            </nav>
+        </div>
+
+        <div class="flex-grow-1 p-0">
+            <div class="page-header">
+                <div>
+                    <h3>Gestion des Catégories</h3>
+                    <ol class="breadcrumb breadcrumb-ar mb-0">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+                        <li class="breadcrumb-item active">Catégories</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="px-4 pb-4">
+
+                <div th:if="${success}" class="alert-ar-success mb-4">
+                    <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+                </div>
+                <div th:if="${error}" class="alert-ar-danger mb-4">
+                    <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Add category form -->
+                    <div class="col-md-4">
+                        <div class="form-card">
+                            <div class="form-card-header">
+                                <i class="fas fa-plus me-2"></i>Nouvelle Catégorie
+                            </div>
+                            <div class="form-card-body">
+                                <form th:action="@{/admin/categorie/nouveau}" method="post" th:object="${categorie}">
+                                    <div class="mb-3">
+                                        <label class="ar-label">Nom de la catégorie *</label>
+                                        <input type="text" class="ar-input" th:field="*{nom}"
+                                               placeholder="Ex: Économique, Luxe..." required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="ar-label">Description</label>
+                                        <textarea class="ar-input" th:field="*{description}" rows="3"
+                                                  placeholder="Description de la catégorie..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn-primary-ar w-100" style="display:block;text-align:center;">
+                                        <i class="fas fa-plus me-2"></i>Créer la catégorie
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Categories list -->
+                    <div class="col-md-8">
+                        <div class="ar-table-wrapper">
+                            <div class="ar-table-header">
+                                <h6 class="ar-table-title"><i class="fas fa-tags me-2" style="color:var(--accent)"></i>Catégories existantes</h6>
+                                <span class="badge-ar badge-agent" th:text="${categories.size() + ' catégorie(s)'}"></span>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="ar-table">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nom</th>
+                                        <th>Description</th>
+                                        <th>Nb Véhicules</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="c : ${categories}">
+                                        <td class="td-muted" th:text="${c.id}"></td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div style="width:32px;height:32px;background:rgba(232,160,32,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                                                    <i class="fas fa-tag" style="color:var(--accent-dark);font-size:0.75rem;"></i>
+                                                </div>
+                                                <span class="td-bold" th:text="${c.nom}"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-muted" th:text="${c.description ?: '—'}"></td>
+                                        <td>
+                        <span class="badge-ar badge-client"
+                              th:text="${c.vehicules != null ? c.vehicules.size() + ' véh.' : '0 véh.'}"></span>
+                                        </td>
+                                        <td>
+                                            <form th:action="@{/admin/categorie/{id}/supprimer(id=${c.id})}" method="post"
+                                                  onsubmit="return confirm('Supprimer cette catégorie ?')">
+                                                <button type="submit" class="action-btn danger" title="Supprimer">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${categories.isEmpty()}">
+                                        <td colspan="5">
+                                            <div class="empty-state py-4">
+                                                <i class="fas fa-tags"></i>
+                                                <p>Aucune catégorie. Créez-en une.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{common/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Utilisateurs - Admin AutoRent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+<nav th:replace="~{common/layout :: navbar}"></nav>
+
+<div class="container-fluid p-0">
+    <div class="d-flex" style="min-height: calc(100vh - 73px)">
+
+        <!-- Sidebar Admin -->
+        <div class="sidebar" style="width:240px;flex-shrink:0;">
+            <div class="sidebar-header">
+                <span class="role-badge">Admin</span>
+                <p class="sidebar-title">Administration</p>
+            </div>
+            <nav class="sidebar-nav">
+                <span class="nav-section">Tableau de bord</span>
+                <a th:href="@{/admin/dashboard}" class="sidebar-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <span class="nav-section">Gestion</span>
+                <a th:href="@{/admin/utilisateurs}" class="sidebar-link active"><i class="fas fa-users"></i> Utilisateurs</a>
+                <a th:href="@{/admin/vehicules}" class="sidebar-link"><i class="fas fa-car"></i> Véhicules</a>
+                <a th:href="@{/admin/categories}" class="sidebar-link"><i class="fas fa-tags"></i> Catégories</a>
+                <a th:href="@{/admin/reservations}" class="sidebar-link"><i class="fas fa-calendar"></i> Réservations</a>
+                <span class="nav-section">Outils</span>
+                <a th:href="@{/agent/agenda}" class="sidebar-link"><i class="fas fa-calendar-alt"></i> Agenda</a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-grow-1 p-0">
+            <div class="page-header">
+                <div>
+                    <h3>Gestion des Utilisateurs</h3>
+                    <ol class="breadcrumb breadcrumb-ar mb-0">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+                        <li class="breadcrumb-item active">Utilisateurs</li>
+                    </ol>
+                </div>
+                <a th:href="@{/admin/utilisateur/nouveau}" class="btn-primary-ar" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+                    <i class="fas fa-user-plus"></i> Nouvel Utilisateur
+                </a>
+            </div>
+
+            <div class="px-4 pb-4">
+
+                <div th:if="${success}" class="alert-ar-success mb-4">
+                    <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+                </div>
+                <div th:if="${error}" class="alert-ar-danger mb-4">
+                    <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+                </div>
+
+                <div class="ar-table-wrapper">
+                    <div class="ar-table-header">
+                        <h6 class="ar-table-title"><i class="fas fa-users me-2" style="color:var(--accent)"></i>Tous les utilisateurs</h6>
+                        <span class="badge-ar badge-admin" th:text="${utilisateurs.size() + ' utilisateur(s)'}"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="ar-table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Utilisateur</th>
+                                <th>Email</th>
+                                <th>Téléphone</th>
+                                <th>Rôle</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="u : ${utilisateurs}">
+                                <td class="td-muted" th:text="${u.id}"></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div style="width:38px;height:38px;background:var(--light-bg);border:1.5px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                                            <i class="fas fa-user" style="font-size:0.85rem;color:var(--text-muted);"></i>
+                                        </div>
+                                        <div>
+                                            <div class="td-bold" th:text="${u.fullName}"></div>
+                                            <div class="td-muted" th:text="${u.adresse}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td th:text="${u.email}"></td>
+                                <td th:text="${u.telephone ?: '—'}"></td>
+                                <td>
+                                    <span class="badge-ar badge-admin" th:if="${u.role.name() == 'ADMIN'}">Admin</span>
+                                    <span class="badge-ar badge-agent" th:if="${u.role.name() == 'AGENT'}">Agent</span>
+                                    <span class="badge-ar badge-client" th:if="${u.role.name() == 'CLIENT'}">Client</span>
+                                </td>
+                                <td>
+                    <span class="badge-ar badge-active" th:if="${u.actif}">
+                      <i class="fas fa-circle me-1" style="font-size:0.5rem;"></i>Actif
+                    </span>
+                                    <span class="badge-ar badge-inactive" th:unless="${u.actif}">
+                      <i class="fas fa-circle me-1" style="font-size:0.5rem;"></i>Inactif
+                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <form th:action="@{/admin/utilisateur/{id}/toggle(id=${u.id})}" method="post">
+                                            <button type="submit" class="action-btn info" th:title="${u.actif ? 'Désactiver' : 'Activer'}">
+                                                <i th:class="${u.actif ? 'fas fa-toggle-on' : 'fas fa-toggle-off'}"></i>
+                                            </button>
+                                        </form>
+                                        <form th:action="@{/admin/utilisateur/{id}/supprimer(id=${u.id})}" method="post"
+                                              onsubmit="return confirm('Supprimer cet utilisateur ?')">
+                                            <button type="submit" class="action-btn danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${utilisateurs.isEmpty()}">
+                                <td colspan="7">
+                                    <div class="empty-state py-4">
+                                        <i class="fas fa-users"></i>
+                                        <p>Aucun utilisateur enregistré</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{common/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

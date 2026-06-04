@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Nos Véhicules - AutoRent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+<nav th:replace="~{common/layout :: navbar}"></nav>
+
+<div class="container py-5">
+    <h2 class="fw-bold mb-4"><i class="fas fa-car me-2 text-warning"></i>Nos Véhicules</h2>
+
+    <!-- Filtres -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form th:action="@{/vehicules/rechercher}" method="post" th:object="${searchDto}" class="row g-3">
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small">Date début</label>
+                    <input type="date" class="form-control form-control-sm" th:field="*{dateDebut}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small">Date fin</label>
+                    <input type="date" class="form-control form-control-sm" th:field="*{dateFin}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small">Catégorie</label>
+                    <select class="form-select form-select-sm" th:field="*{categorieId}">
+                        <option value="">Toutes catégories</option>
+                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.nom}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small">Prix max (MRU/j)</label>
+                    <input type="number" class="form-control form-control-sm" th:field="*{prixMax}" min="0" step="10">
+                </div>
+                <div class="col-md-3 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-warning btn-sm fw-bold px-3">
+                        <i class="fas fa-search me-1"></i>Rechercher
+                    </button>
+                    <a th:href="@{/vehicules}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-redo me-1"></i>Réinitialiser
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Résultats -->
+    <div class="row g-4" th:if="${!vehicules.isEmpty()}">
+        <div class="col-md-4" th:each="v : ${vehicules}">
+            <div class="card h-100 shadow-sm vehicle-card">
+                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center position-relative" style="height:180px">
+                    <i class="fas fa-car fa-4x text-white"></i>
+                    <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2"
+                          th:text="${v.categorie.nom}"></span>
+                </div>
+                <div class="card-body">
+                    <h5 class="fw-bold" th:text="${v.marque + ' ' + v.modele}"></h5>
+                    <p class="text-muted small" th:text="${v.description}"></p>
+                    <div class="row g-1 small text-muted mb-3">
+                        <div class="col-6"><i class="fas fa-calendar me-1"></i><span th:text="${v.annee}"></span></div>
+                        <div class="col-6"><i class="fas fa-users me-1"></i><span th:text="${v.nombrePlaces + ' places'}"></span></div>
+                        <div class="col-6"><i class="fas fa-gas-pump me-1"></i><span th:text="${v.typeCarburant}"></span></div>
+                        <div class="col-6"><i class="fas fa-cog me-1"></i><span th:text="${v.transmission}"></span></div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-success fs-5">
+                            <th:block th:text="${v.prixParJour}"></th:block> MRU/jour
+                        </span>
+                        <div>
+                            <a th:href="@{/vehicules/{id}(id=${v.id})}" class="btn btn-outline-dark btn-sm">
+                                <i class="fas fa-eye me-1"></i>Détails
+                            </a>
+                            <a sec:authorize="isAuthenticated()"
+                               th:href="@{/client/reserver/{id}(id=${v.id})}"
+                               class="btn btn-warning btn-sm ms-1">
+                                Réserver
+                            </a>
+                            <a sec:authorize="!isAuthenticated()"
+                               th:href="@{/login}"
+                               class="btn btn-warning btn-sm ms-1">
+                                Réserver
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center py-5" th:if="${vehicules.isEmpty()}">
+        <i class="fas fa-car fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted">Aucun véhicule disponible pour ces critères</h4>
+        <a th:href="@{/vehicules}" class="btn btn-warning mt-3">Voir tous les véhicules</a>
+    </div>
+</div>
+
+<footer th:replace="~{common/layout :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
