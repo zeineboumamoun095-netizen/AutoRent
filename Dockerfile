@@ -1,4 +1,11 @@
-FROM eclipse-temurin:26-jre
+FROM eclipse-temurin:26-jdk
+
 WORKDIR /app
-COPY target/autorent-0.0.1-SNAPSHOT.jar.original app.jar
-CMD ["java", "-jar", "app.jar"]
+
+COPY . .
+
+RUN chmod +x mvnw
+
+RUN ./mvnw clean package -DskipTests
+
+CMD ["java","-jar","target/autorent-0.0.1-SNAPSHOT.jar.origin"]
