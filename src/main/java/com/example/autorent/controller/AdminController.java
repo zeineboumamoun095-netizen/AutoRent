@@ -181,4 +181,9 @@ public class AdminController {
     public String accesRefuse() {
         return "acces-refuse"; // يجب أن يطابق اسم الملف تماماً
     }
+
+    @GetMapping("/health")
+    public String health() {
+        return "OK";
+    }
 }
