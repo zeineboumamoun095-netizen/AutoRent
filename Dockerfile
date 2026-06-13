@@ -1,28 +1,34 @@
-# ===== المرحلة الأولى: البناء =====
-FROM eclipse-temurin:26-jdk AS builder
+# =============================================
+#  AutoRent — Dockerfile
+#  Build multi-stage pour image légère
+# =============================================
+
+# ── Stage 1: Build avec Maven ────────────────
+FROM maven:3.9.5-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
-# نسخ ملفات Maven أولاً (لتحسين الـ cache)
+# Copier pom.xml en premier (cache des dépendances)
 COPY pom.xml .
-COPY mvnw .
-COPY .mvn .mvn
+RUN mvn dependency:go-offline -B
 
-# تحميل الـ dependencies
-RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
-
-# نسخ الكود المصدري والبناء
+# Copier le code source et compiler
 COPY src ./src
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests -B
 
-# ===== المرحلة الثانية: التشغيل =====
-FROM eclipse-temurin:26-jre
+# ── Stage 2: Image finale légère ─────────────
+FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-# نسخ الـ JAR فقط من مرحلة البناء
-COPY --from=builder /app/target/autorent-0.0.1-SNAPSHOT.jar app.jar
+# Copier le JAR depuis l'étape build
+COPY --from=build /app/target/*.jar app.jar
 
+# Port exposé
 EXPOSE 8080
 
-CMD ["java", "-jar", "app.jar"]
+# Lancer avec profil PROD
+ENTRYPOINT ["java", \
+  "-Dspring.profiles.active=prod", \
+  "-Djava.security.egd=file:/dev/./urandom", \
+  "-jar", "app.jar"]

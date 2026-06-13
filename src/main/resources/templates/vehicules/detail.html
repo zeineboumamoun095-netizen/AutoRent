@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail véhicule</title>
+</head>
+<body>
+<h1>Détail du véhicule</h1>
+<!-- Template minimale pour les tests. Le contrôleur fournit normalement un objet 'vehicule' dans le modèle. -->
+<div th:if="${vehicule}">
+    <p th:text="${vehicule.marque} + ' ' + ${vehicule.modele}">Marque Modèle</p>
+</div>
+</body>
+</html>
+
