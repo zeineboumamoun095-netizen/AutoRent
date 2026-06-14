@@ -11,12 +11,13 @@
 <nav th:replace="~{common/layout :: navbar}"></nav>
 
 <div class="container py-5">
-    <h2 class="fw-bold mb-4"><i class="fas fa-calendar-check me-2 text-warning"></i>Formulaire de Réservation</h2>
+    <h2 class="fw-bold mb-4">
+        <i class="fas fa-calendar-check me-2 text-warning"></i>Formulaire de Réservation
+    </h2>
 
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
 
     <div class="row g-4">
-        <!-- Récapitulatif véhicule -->
         <div class="col-md-4">
             <div class="card shadow-sm">
                 <div class="card-header bg-warning text-dark fw-bold">
@@ -49,55 +50,43 @@
                         <hr>
                         <div class="d-flex justify-content-between">
                             <span class="text-muted">Prix/jour:</span>
-                            <span class="fw-bold text-success fs-5" th:text="${vehicule.prixParJour + ' €'}"></span>
+                            <span class="fw-bold text-success fs-5" th:text="${vehicule.prixParJour + ' MRU'}"></span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Formulaire -->
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-dark text-white fw-bold">
                     <i class="fas fa-edit me-2"></i>Détails de la réservation
                 </div>
                 <div class="card-body p-4">
-                    <form th:action="@{/client/reserver}" method="post" th:object="${reservationDto}" id="reservationForm">
-                        <input type="hidden" th:field="*{vehiculeId}" th:value="${vehicule.id}">
+                    <form th:action="@{/client/reserver}" method="post" th:object="${reservationDto}">
+
+                        <input type="hidden" name="vehiculeId" th:value="${vehicule.id}">
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">
-                                    <i class="fas fa-calendar-alt me-1 text-warning"></i>Date de début *
-                                </label>
-                                <input type="date" class="form-control" th:field="*{dateDebut}"
-                                       th:classappend="${#fields.hasErrors('dateDebut')} ? 'is-invalid'"
-                                       id="dateDebut" required>
-                                <div class="invalid-feedback" th:errors="*{dateDebut}"></div>
+                                <label class="form-label fw-bold">Date de début *</label>
+                                <input type="date" class="form-control" th:field="*{dateDebut}" id="dateDebut" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">
-                                    <i class="fas fa-calendar-check me-1 text-warning"></i>Date de fin *
-                                </label>
-                                <input type="date" class="form-control" th:field="*{dateFin}"
-                                       th:classappend="${#fields.hasErrors('dateFin')} ? 'is-invalid'"
-                                       id="dateFin" required>
-                                <div class="invalid-feedback" th:errors="*{dateFin}"></div>
+                                <label class="form-label fw-bold">Date de fin *</label>
+                                <input type="date" class="form-control" th:field="*{dateFin}" id="dateFin" required>
                             </div>
                             <div class="col-12">
                                 <label class="form-label fw-bold">Remarques</label>
-                                <textarea class="form-control" th:field="*{remarques}" rows="3"
-                                          placeholder="Remarques ou demandes particulières..."></textarea>
+                                <textarea class="form-control" th:field="*{remarques}" rows="3"></textarea>
                             </div>
                         </div>
 
-                        <!-- Calcul dynamique -->
-                        <div class="card border-success mt-4" id="calculCard" style="display:none!important">
+                        <div class="card border-success mt-4" id="calculCard" style="display:none">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="fw-bold">Coût estimé:</span>
-                                    <span class="fw-bold text-success fs-4" id="coutEstime">0 €</span>
+                                    <span class="fw-bold text-success fs-4" id="coutEstime">0 MRU</span>
                                 </div>
                                 <small class="text-muted" id="dureeText"></small>
                             </div>
@@ -118,36 +107,42 @@
     </div>
 </div>
 
+<div>
+    <span id="prix-data" th:data-prix="${vehicule.prixParJour}"></span>
+</div>
+
 <footer th:replace="~{common/layout :: footer}"></footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script th:inline="javascript">
-    const prixParJour = [[$,{vehicule,prixParJour}]];
-    const dateDebut = document.getElementById('dateDebut');
-    const dateFin = document.getElementById('dateFin');
-    const calculCard = document.getElementById('calculCard');
-    const coutEstime = document.getElementById('coutEstime');
-    const dureeText = document.getElementById('dureeText');
+<script>
+    var prixParJour = parseFloat(
+        document.querySelector('[data-prix]') ?
+            document.querySelector('[data-prix]').getAttribute('data-prix') : 0
+    );
+
+    var dateDebut  = document.getElementById('dateDebut');
+    var dateFin    = document.getElementById('dateFin');
+    var calculCard = document.getElementById('calculCard');
+    var coutEstime = document.getElementById('coutEstime');
+    var dureeText  = document.getElementById('dureeText');
+
+    var today = new Date().toISOString().split('T')[0];
+    dateDebut.min = today;
+    dateFin.min   = today;
 
     function calculerCout() {
         if (dateDebut.value && dateFin.value) {
-            const d1 = new Date(dateDebut.value);
-            const d2 = new Date(dateFin.value);
-            const jours = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24));
+            var d1    = new Date(dateDebut.value);
+            var d2    = new Date(dateFin.value);
+            var jours = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24));
             if (jours > 0) {
-                const cout = (jours * prixParJour).toFixed(2);
-                coutEstime.textContent = cout + ' €';
-                dureeText.textContent = jours + ' jour(s) × ' + prixParJour + ' €/jour';
-                calculCard.style.removeProperty('display');
+                coutEstime.textContent = (jours * prixParJour).toFixed(2) + ' MRU';
+                dureeText.textContent  = jours + ' jour(s) × ' + prixParJour + ' MRU/jour';
+                calculCard.style.display = 'block';
             }
         }
     }
 
-    // Set min date to today
-    const today = new Date().toISOString().split('T')[0];
-    dateDebut.min = today;
-    dateFin.min = today;
-
-    dateDebut.addEventListener('change', () => {
+    dateDebut.addEventListener('change', function() {
         dateFin.min = dateDebut.value;
         calculerCout();
     });

@@ -29,7 +29,7 @@ public class Reservation {
     private LocalDate dateFin;
 
     private BigDecimal coutTotal;
-
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     private ReservationStatus statut = ReservationStatus.EN_ATTENTE;
 

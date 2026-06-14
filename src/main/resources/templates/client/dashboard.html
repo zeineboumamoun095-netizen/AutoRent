@@ -61,7 +61,7 @@
                         <td th:text="${#temporals.format(r.dateDebut, 'dd/MM/yyyy')}"></td>
                         <td th:text="${#temporals.format(r.dateFin, 'dd/MM/yyyy')}"></td>
                         <td th:text="${r.nombreJours + ' jour(s)'}"></td>
-                        <td class="fw-bold text-success" th:text="${r.coutTotal + ' €'}"></td>
+                        <td class="fw-bold text-success" th:text="${r.coutTotal + ' MRU'}"></td>
                         <td>
                                 <span th:class="${'badge ' +
                                     (r.statut.name() == 'EN_ATTENTE' ? 'bg-warning text-dark' :
